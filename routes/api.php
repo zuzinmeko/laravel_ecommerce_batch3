@@ -19,9 +19,12 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 });
 
 Route::apiresource('brands','BrandController');
-
 Route::apiresource('categories','CategoryController');
-
 Route::apiresource('subcategories','SubcategoryController');
-
 Route::apiresource('items','ItemController');
+
+Route::apiresource('users','UserController');
+
+Route::post('login', 'UserController@login')->name('login');
+
+

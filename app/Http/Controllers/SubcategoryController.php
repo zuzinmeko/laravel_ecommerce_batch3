@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Subcategory;
 use Illuminate\Http\Request;
+use App\Http\Resources\SubcategoryResource;
+
 
 class SubcategoryController extends Controller
 {
@@ -14,7 +16,12 @@ class SubcategoryController extends Controller
      */
     public function index()
     {
-        //
+               $subcategories=Subcategory::all();
+               return response()->json([
+                'status'=>'ok! success customer',
+                'totalResults'=>count($subcategories),
+                'subcategories'=>SubcategoryResource::collection($subcategories)
+            ]);
     }
 
     /**
@@ -25,7 +32,25 @@ class SubcategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        
+         $request->validate([
+            "name" => "required|min:5",
+            "category" => "required", // a.jpg
+        
+       
+        ]);
+
+        // if include file, upload
+      
+
+        // data insert
+        $subcategory = new Subcategory;
+        $subcategory->name = $request->name;
+        $subcategory->category_id = $request->category;
+        $subcategory->save();
+
+        // return
+        return new SubcategoryResource($subcategory);
     }
 
     /**
@@ -36,7 +61,7 @@ class SubcategoryController extends Controller
      */
     public function show(Subcategory $subcategory)
     {
-        //
+        return new SubcategoryResource($subcategory);
     }
 
     /**
@@ -48,7 +73,23 @@ class SubcategoryController extends Controller
      */
     public function update(Request $request, Subcategory $subcategory)
     {
-        //
+         
+         $request->validate([
+            "name" => "required|min:5",
+            "category" => "required", // a.jpg
+        
+       
+        ]);
+
+       
+        // data insert
+       
+        $subcategory->name = $request->name;
+        $subcategory->category_id = $request->category;
+        $subcategory->save();
+
+        // return
+        return new SubcategoryResource($subcategory);
     }
 
     /**
@@ -59,6 +100,7 @@ class SubcategoryController extends Controller
      */
     public function destroy(Subcategory $subcategory)
     {
-        //
+        $subcategory->delete();
+      return new SubcategoryResource($subcategory);
     }
 }

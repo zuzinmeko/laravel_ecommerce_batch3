@@ -16,9 +16,11 @@ class ItemResource extends JsonResource
      * @param  \Illuminate\Http\Request  $request
      * @return array
      */
+    public static $wrap='item';
+    
     public function toArray($request)
     {
-        //return parent::toArray($request);
+       
         return [
             'id' => $this->id,
             'codeno'=>$this->codeno,

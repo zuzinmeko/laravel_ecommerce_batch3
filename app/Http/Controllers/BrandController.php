@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Brand;
 use Illuminate\Http\Request;
+use App\Http\Resources\BrandResource;
+
 
 class BrandController extends Controller
 {
@@ -14,8 +16,9 @@ class BrandController extends Controller
      */
     public function index()
     {
+        // $brands=Brand::all();
+        // return $brands;
         $brands=Brand::all();
-        //return $items;
         return response()->json([
             'status'=>'ok! success customer',
             'totalResults'=>count($brands),
@@ -32,7 +35,31 @@ class BrandController extends Controller
     public function store(Request $request)
     {
       
+         $request->validate([
+            "name" => "required|min:5",
+            "photo" => "required", // a.jpg
+        
+       
+        ]);
 
+        // if include file, upload
+        if($request->file()) {
+            // 624872374523_a.jpg
+            $fileName = time().'_'.$request->photo->getClientOriginalName();
+            // itemimg/624872374523_a.jpg
+            $filePath = $request->file('photo')->storeAs('brandimg', $fileName, 'public');
+            
+            $path = '/storage/'.$filePath;
+        }
+
+        // data insert
+        $brand = new Brand;
+        $brand->name = $request->name;
+        $brand->photo = $path;
+        $brand->save();
+
+        // return
+        return new BrandResource($brand);
     }
 
     /**
@@ -43,7 +70,7 @@ class BrandController extends Controller
      */
     public function show(Brand $brand)
     {
-          return new ItemResource($brand);
+          return new BrandResource($brand);
     }
 
     /**
@@ -56,7 +83,34 @@ class BrandController extends Controller
     public function update(Request $request, Brand $brand)
     {
          
+         $request->validate([
+            "name" => "required|min:5",
+           
+            "photo" => "sometimes|required", // a.jpg
+       
+            
+        ]);
+
+        // if include file, upload
+        if($request->file()) {
+            // 624872374523_a.jpg
+            $fileName = time().'_'.$request->photo->getClientOriginalName();
+            // itemimg/624872374523_a.jpg
+            $filePath = $request->file('photo')->storeAs('brandimg', $fileName, 'public');
+            
+            $path = '/storage/'.$filePath;
+        }else{
+            $path = $request->oldphoto;
+        }
+
+        // data insert
         
+        $brand->name = $request->name;
+        $brand->photo = $path;
+        $brand->save();
+
+        // return
+        return new BrandResource($brand);
     }
 
     /**
@@ -67,6 +121,7 @@ class BrandController extends Controller
      */
     public function destroy(Brand $brand)
     {
-        
+       $brand->delete();
+       return new BrandResource($brand);
     }
 }

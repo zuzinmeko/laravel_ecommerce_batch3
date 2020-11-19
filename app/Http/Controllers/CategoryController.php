@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Category;
 use Illuminate\Http\Request;
+use App\Http\Resources\CagtegoryResource;
+
 
 class CategoryController extends Controller
 {
@@ -19,7 +21,7 @@ class CategoryController extends Controller
         return response()->json([
             'status'=>'ok! success customer',
             'totalResults'=>count($categories),
-            'categories'=>CategoryResource::collection($categories)
+            'categories'=>CagtegoryResource::collection($categories)
         ]);
     }
 
@@ -31,7 +33,31 @@ class CategoryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            "name" => "required|min:5",
+            "photo" => "required", // a.jpg
+        
+       
+        ]);
+
+        // if include file, upload
+        if($request->file()) {
+            // 624872374523_a.jpg
+            $fileName = time().'_'.$request->photo->getClientOriginalName();
+            // itemimg/624872374523_a.jpg
+            $filePath = $request->file('photo')->storeAs('categoryimg', $fileName, 'public');
+            
+            $path = '/storage/'.$filePath;
+        }
+
+        // data insert
+        $category = new Category;
+        $category->name = $request->name;
+        $category->photo = $path;
+        $category->save();
+
+        // return
+        return new CagtegoryResource($category);
     }
 
     /**
@@ -42,7 +68,7 @@ class CategoryController extends Controller
      */
     public function show(Category $category)
     {
-        //
+         return new CagtegoryResource($category);
     }
 
     /**
@@ -54,7 +80,34 @@ class CategoryController extends Controller
      */
     public function update(Request $request, Category $category)
     {
-        //
+         $request->validate([
+            "name" => "required|min:5",
+           
+            "photo" => "sometimes|required", // a.jpg
+       
+            
+        ]);
+
+        // if include file, upload
+        if($request->file()) {
+            // 624872374523_a.jpg
+            $fileName = time().'_'.$request->photo->getClientOriginalName();
+            // itemimg/624872374523_a.jpg
+            $filePath = $request->file('photo')->storeAs('categoryimg', $fileName, 'public');
+            
+            $path = '/storage/'.$filePath;
+        }else{
+            $path = $request->oldphoto;
+        }
+
+        // data insert
+        
+        $category->name = $request->name;
+        $category->photo = $path;
+        $category->save();
+
+        // return
+        return new CagtegoryResource($category);
     }
 
     /**
@@ -65,6 +118,7 @@ class CategoryController extends Controller
      */
     public function destroy(Category $category)
     {
-        //
-    }
+       $category->delete();
+       return new CagtegoryResource($category);
+   }
 }
